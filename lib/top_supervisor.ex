@@ -1,24 +1,29 @@
-defmodule TopSupervisor.Supervisor do
+defmodule TopSupervisor do
   @moduledoc false
   use Supervisor
   require Logger
 
-  def start_link(:engagement) do
-    Supervisor.start_link(__MODULE__, %{}, name: EngagementTopSupervisor)
+  def start_link(type) do
+    Supervisor.start_link(__MODULE__, type, name: String.to_atom("#{type}TopSupervisor"))
   end
 
-  def start_link(:sentiment) do
-    Supervisor.start_link(__MODULE__, %{}, name: EngagementTopSupervisor)
-  end
-
-  def init(_arg) do
+  def init(type) do
     children = [
       %{
         id: LoadBalancer,
-        start: {LoadBalancer, :start_link, []}
+        start: {LoadBalancer, :start_link, [type]}
+      },
+      %{
+        id: AutoScaler,
+        start: {AutoScaler, :start_link, [type]}
+      },
+      %{
+        id: PoolSupervisor,
+        start: {PoolSupervisor, :start_link, [type]}
       },
     ]
 
-    supervise(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
+
 end
