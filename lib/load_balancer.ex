@@ -2,12 +2,8 @@ defmodule LoadBalancer do
   @moduledoc false
   use GenServer
 
-  def start_link(:engagement) do
-    GenServer.start_link(__MODULE__, 0, name: EngagementLoadBalancer)
-  end
-
-  def start_link(:sentiment) do
-    GenServer.start_link(__MODULE__, 0, name: SentimentLoadBalancer)
+  def start_link(type) do
+    GenServer.start_link(__MODULE__, 0, name: String.to_atom("#{type}LoadBalancer"))
   end
 
   def receive_tweet(id, tweet) do
