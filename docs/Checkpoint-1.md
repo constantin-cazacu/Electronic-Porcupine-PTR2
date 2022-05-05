@@ -8,10 +8,17 @@ Following, the results of these calculations should be reconnected with the twee
 batches and, finally, saved to a database.
 
 ## Checkpoint #1
+### Application Supervision Tree
+Here is the diagram of the supervision tree for the application.  
+Mainly, there will be 5 supervisors, Application-level supervisor, Top Supervisor(Engagement Ratio/Sentiment Score), Pool Supervisor(Engagement Ratio/Sentiment Score)    
+![supervision.png](app-supervision-tree.png)
+
 ### System Architecture Diagram
+Diagram showcasing the architecture, clouds representing higher level abstractions  
 ![diagram.png](system-architecture.png)
 
 ### Data Flow
+Data flow diagram showcasing the supervision inside worker pools  
 ![data_flow.png](data-flow.png)
 
 ### Actors' Endpoints
