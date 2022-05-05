@@ -5,12 +5,8 @@ defmodule AutoScaler do
 
   use GenServer
 
-  def start_link(:engagement) do
-    GenServer.start_link(__MODULE__, state, name: EngagementAutoScaler)
-  end
-
-  def start_link(:sentiment) do
-    GenServer.start_link(__MODULE__, state, name: SentimentAutoScaler)
+  def start_link(type) do
+    GenServer.start_link(__MODULE__, type, name: String.to_atom("#{type}AutoScaler"))
   end
 
   def init(_opts) do
