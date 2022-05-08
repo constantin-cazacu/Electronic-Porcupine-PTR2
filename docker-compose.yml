@@ -29,10 +29,5 @@ services:
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
-#  mongo-express:
-#    image: mongo-express
-#    ports:
-#      - 8080:8080
-#    restart: always
 
 
