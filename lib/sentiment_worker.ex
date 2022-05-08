@@ -24,10 +24,10 @@ defmodule SentimentWorker do
 
   defp parse_tweet(id, tweet_data) do
     tweet_msg = tweet_data["message"]["tweet"]["text"]
-    tweet_sentiment_score = tweet_msg
+    sentiment_score = tweet_msg
     |> parse_words()
     |> calculate_sentiment_score()
-    Aggregator.add_sentiment_score(id, tweet_sentiment_score)
+    Aggregator.add_sentiment_score(id, sentiment_score)
   end
 
   def init(state) do
