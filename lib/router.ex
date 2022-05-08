@@ -7,7 +7,7 @@ defmodule Router do
   end
 
   def receive_tweet(tweet) do
-    id = System.unique_integer([:positve, :monotonic])
+    id = System.unique_integer([:positive, :monotonic])
     GenServer.cast(__MODULE__, {id, tweet})
 #    IO.inspect(id)
   end
@@ -20,7 +20,7 @@ defmodule Router do
     EngagementLoadBalancer.receive_tweet(id, tweet)
     SentimentLoadBalancer.receive_tweet(id, tweet)
     RetweetLoadBalancer.receive_tweet(id, tweet)
-    {:ok, tweet_data} = Poison.decode(tweet.data)
+    {:ok, tweet_data} = Poison.decode(tweet)
     Aggregator.add_tweet_info(id, tweet_data)
     {:noreply, state}
   end
