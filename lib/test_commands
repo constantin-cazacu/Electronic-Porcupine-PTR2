@@ -11,3 +11,6 @@ AutoScaler.start_link()
 TweetProcessor.start()
 
 mix run --no-halt --eval ":observer.start"
+
+docker-compose -f docker-compose.yml up
+docker-compose -f docker-compose.yml down
