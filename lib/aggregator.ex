@@ -46,7 +46,7 @@ defmodule Aggregator do
     tweet_user = tweet["user"]
     tweet = Map.update!(tweet, "user", fn user -> user["id"] end)
 
-    %{tweet_data: %{engagement_score: record["engagement"], sentiment_score: record["sentiment"], tweet: tweet}, user: user}
+    %{tweet_data: %{engagement_score: record["engagement"], sentiment_score: record["sentiment"], tweet: tweet}, user: tweet_user}
   end
 
   def create_record(record_type, info, id, state) do
