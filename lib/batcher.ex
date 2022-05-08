@@ -10,7 +10,7 @@ defmodule Batcher do
     GenServer.cast(__MODULE__, {:add, record})
   end
 
-  def schedule_buffer() do
+  def schedule_batcher() do
     Process.send_after(self(), :free, 1000)
   end
 
@@ -20,20 +20,20 @@ defmodule Batcher do
   end
 
   def handle_cast({:add, record}, state) do
-    record_buffer = [record | state.buffer]
+    record_buffer = [record | state.batch]
     case state.records_per_interval > 200 do
       true ->
         :open_connection_and_send
+        schedule_batcher()
         {:noreply, %{batch: [], records_per_interval: 0}}
       false ->
-        {:noreply, state}
+        {:noreply, %{batch: record_buffer, records_per_interval: state.records_per_interval + 1}}
     end
-    {:noreply, %{batch: record_buffer, records_per_interval: state.records_per_interval + 1}}
   end
 
   def handle_info(:free, state) do
     :open_connection_and_send
-    schedule_buffer()
-    {:noreply, state}
+    schedule_batcher()
+    {:noreply, %{batch: [], records_per_interval: 0}}
   end
 end
