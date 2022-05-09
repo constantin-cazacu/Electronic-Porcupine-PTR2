@@ -11,8 +11,8 @@ services:
 
   mongoM2:
     image: mongo
-    container_name: mongoM1
-    hostname: mongoM1
+    container_name: mongoM2
+    hostname: mongoM2
 
     ports:
       - 27018:27017
@@ -21,8 +21,8 @@ services:
 
   mongoM3:
     image: mongo
-    container_name: mongoM1
-    hostname: mongoM1
+    container_name: mongoM3
+    hostname: mongoM3
 
     ports:
       - 27019:27017
