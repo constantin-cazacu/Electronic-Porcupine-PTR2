@@ -4,6 +4,7 @@ defmodule TopSupervisor do
   require Logger
 
   def start_link(type) do
+    IO.inspect(">>> Starting #{type} Top Supervisor <<<")
     Supervisor.start_link(__MODULE__, type, name: String.to_atom("#{type}TopSupervisor"))
   end
 

@@ -12,18 +12,18 @@ defmodule TweetProcessor do
     url2 = "http://localhost:4000/tweets/2"
 
     children = [
-      %{
-        id: StreamReader1,
-        start: {StreamReader, :start_link, [url1]}
-      },
-      %{
-        id: StreamReader2,
-        start: {StreamReader, :start_link, [url2]}
-      },
-      %{
-        id: Router,
-        start: {Router, :start_link, []}
-      },
+#      %{
+#        id: StreamReader1,
+#        start: {StreamReader, :start_link, [url1]}
+#      },
+#      %{
+#        id: StreamReader2,
+#        start: {StreamReader, :start_link, [url2]}
+#      },
+#      %{
+#        id: Router,
+#        start: {Router, :start_link, []}
+#      },
 #      %{
 #        id: EngagementTopSupervisor,
 #        start: {TopSupervisor, :start_link, ["Engagement"]}
@@ -40,10 +40,10 @@ defmodule TweetProcessor do
 #        id: Aggregator,
 #        start: {Aggregator, :start_link, []}
 #      },
-#      %{
-#        id: Batcher,
-#        start: {Batcher, :start_link, []}
-#      },
+      %{
+        id: Batcher,
+        start: {Batcher, :start_link, []}
+      },
     ]
 
     opts = [strategy: :one_for_one, max_restarts: 100, name: __MODULE__]

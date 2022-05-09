@@ -1,9 +1,10 @@
-defmodule SentimentWorker do
-  @moduledoc false
+defmodule SentimentAnalysis.Worker do
   use GenServer
+  require Logger
 
   def start_link(index) do
-    GenServer.start_link(__MODULE__, %{}, nme: String.to_atom("SentimentWorker#{index}"))
+    Logger.info(">>> Starting Sentiment Worker No.#{index} <<<")
+    GenServer.start_link(__MODULE__, %{}, name: String.to_atom("SentimentWorker#{index}"))
   end
 
   def receive_tweet(pid, id, tweet) do
@@ -12,6 +13,7 @@ defmodule SentimentWorker do
 
   defp parse_words(tweet_msg) do
     punctuation = [",", ".", ":", "?", "!"]
+    tweet_msg
     |> String.replace(punctuation, "")
     |> String.split(" ", trim: true)
   end
@@ -19,14 +21,14 @@ defmodule SentimentWorker do
   defp calculate_sentiment_score(tweet_words) do
     tweet_words
     |> Enum.reduce(0, fn tweet_word, acc -> EmotionalScore.get_value(tweet_word) + acc end)
-    |> Kernel./(length(words))
+    |> Kernel./(length(tweet_words))
   end
 
   defp parse_tweet(id, tweet_data) do
     tweet_msg = tweet_data["message"]["tweet"]["text"]
     sentiment_score = tweet_msg
-    |> parse_words()
-    |> calculate_sentiment_score()
+                      |> parse_words()
+                      |> calculate_sentiment_score()
     Aggregator.add_sentiment_score(id, sentiment_score)
   end
 
@@ -44,5 +46,4 @@ defmodule SentimentWorker do
     #    Process.sleep(Enum.random(50..500))
     {:noreply, state}
   end
-
 end

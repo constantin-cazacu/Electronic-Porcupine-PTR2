@@ -1,15 +1,16 @@
 defmodule Router do
   @moduledoc false
   use GenServer
+  require Logger
 
   def start_link() do
-    GenServer.start_link(__MODULE__, %{}, nme: __MODULE__)
+    Logger.info(">>> Starting Router <<<", ansi_color: :yellow_background)
+    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
   def receive_tweet(tweet) do
     id = System.unique_integer([:positive, :monotonic])
     GenServer.cast(__MODULE__, {id, tweet})
-#    IO.inspect(id)
   end
 
   def init(_opts) do
@@ -17,11 +18,12 @@ defmodule Router do
   end
 
   def handle_cast({id, tweet}, state) do
-    EngagementLoadBalancer.receive_tweet(id, tweet)
-    SentimentLoadBalancer.receive_tweet(id, tweet)
-    RetweetLoadBalancer.receive_tweet(id, tweet)
-    {:ok, tweet_data} = Poison.decode(tweet)
-    Aggregator.add_tweet_info(id, tweet_data)
+    EngagementAnalysis.LoadBalancer.get_tweets( id, tweet)
+    EngagementAnalysis.AutoScaler.receive_notification()
+    RetweetExtracting.LoadBalancer.get_tweets(id, tweet)
+    RetweetExtracting.AutoScaler.receive_notification()
+    SentimentAnalysis.LoadBalancer.get_tweets(id, tweet)
+    SentimentAnalysis.AutoScaler.receive_notification()
     {:noreply, state}
   end
 

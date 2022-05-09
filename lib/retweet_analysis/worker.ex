@@ -1,8 +1,9 @@
-defmodule RetweetWorker do
-  @moduledoc false
+defmodule RetweetAnalysis.Worker do
   use GenServer
+  require Logger
 
   def start_link(index) do
+    IO.inspect(">>> Starting Retweet Worker No.#{index} <<<")
     GenServer.start_link(__MODULE__, %{}, name: String.to_atom("RetweetWorker#{index}"))
   end
 
@@ -31,5 +32,4 @@ defmodule RetweetWorker do
     #    Process.sleep(Enum.random(50..500))
     {:noreply, state}
   end
-
 end

@@ -1,8 +1,9 @@
-defmodule EngagementWorker do
-  @moduledoc false
+defmodule EngagementAnalysis.Worker do
   use GenServer
+  require Logger
 
   def start_link(index) do
+    Logger.info(">>> Starting Engagement Worker No.#{index} <<<", ansi_color: :yellow)
     GenServer.start_link(__MODULE__, %{}, name: String.to_atom("EngagementWorker#{index}"))
   end
 
@@ -32,9 +33,7 @@ defmodule EngagementWorker do
     retweet_count = tweet_data["message"]["tweet"]["retweet_count"]
     engagement_score = calculate_engagement_score(favourites_count, follower_count, retweet_count)
     Aggregator.add_engagement_score(id, engagement_score)
-#    Process.sleep(Enum.random(50..500))
+    #    Process.sleep(Enum.random(50..500))
     {:noreply, state}
   end
-
 end
-

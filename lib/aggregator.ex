@@ -1,8 +1,10 @@
 defmodule Aggregator do
   @moduledoc false
   use GenServer
+  require Logger
 
   def start_link() do
+    Logger.info(">>> Starting Aggregator <<<", ansi_color: :yellow_background)
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
