@@ -3,7 +3,7 @@ defmodule RetweetAnalysis.Worker do
   require Logger
 
   def start_link(index) do
-    IO.inspect(">>> Starting Retweet Worker No.#{index} <<<")
+#    IO.inspect("Starting Retweet Worker No.#{index}")
     GenServer.start_link(__MODULE__, %{}, name: String.to_atom("RetweetWorker#{index}"))
   end
 

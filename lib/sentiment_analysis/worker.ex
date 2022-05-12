@@ -3,7 +3,7 @@ defmodule SentimentAnalysis.Worker do
   require Logger
 
   def start_link(index) do
-    Logger.info(">>> Starting Sentiment Worker No.#{index} <<<")
+#    Logger.info("Starting Sentiment Worker No.#{index}")
     GenServer.start_link(__MODULE__, %{}, name: String.to_atom("SentimentWorker#{index}"))
   end
 

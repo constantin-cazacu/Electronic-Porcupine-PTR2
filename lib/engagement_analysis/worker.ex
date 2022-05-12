@@ -3,7 +3,7 @@ defmodule EngagementAnalysis.Worker do
   require Logger
 
   def start_link(index) do
-    Logger.info(">>> Starting Engagement Worker No.#{index} <<<", ansi_color: :yellow)
+#    Logger.info("Starting Engagement Worker No.#{index}", ansi_color: :yellow)
     GenServer.start_link(__MODULE__, %{}, name: String.to_atom("EngagementWorker#{index}"))
   end
 

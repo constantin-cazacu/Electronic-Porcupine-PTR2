@@ -4,7 +4,7 @@ defmodule Batcher do
   require Logger
 
   def start_link() do
-    IO.inspect(">>> Starting Batcher <<<")
+    IO.inspect("Starting Batcher")
     {:ok, mongo_pid} = Mongo.start_link(url: "mongodb://mongoM1:27017,mongoM2:27017,mongoM3:27017/tweeter?replicaSet=rs0")
     GenServer.start_link(__MODULE__, %{batch: [], records_per_interval: 0, mongo_pid: mongo_pid}, name: __MODULE__)
   end
@@ -47,16 +47,17 @@ defmodule Batcher do
     end
   end
 
-  def handle_info(:free, state) do
-    send_batch(state.batch)
-    schedule_batcher()
-    {:noreply, %{batch: [], records_per_interval: 0, mongo_pid: state.mongo_pid}}
-  end
-
   def handle_cast({:send, records}, state) do
     IO.inspect("[Batcher] sending batch")
     Mongo.insert_many(state.mongo_pid, "tweets", get_tweets(records))
     Mongo.insert_many(state.mongo_pid, "users", get_users(records))
     {:noreply, state}
   end
+
+  def handle_info(:free, state) do
+    send_batch(state.batch)
+    schedule_batcher()
+    {:noreply, %{batch: [], records_per_interval: 0, mongo_pid: state.mongo_pid}}
+  end
+
 end

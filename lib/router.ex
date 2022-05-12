@@ -4,7 +4,7 @@ defmodule Router do
   require Logger
 
   def start_link() do
-    Logger.info(">>> Starting Router <<<", ansi_color: :yellow_background)
+    Logger.info("Starting Router", ansi_color: :yellow_background)
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
@@ -18,12 +18,14 @@ defmodule Router do
   end
 
   def handle_cast({id, tweet}, state) do
-    EngagementAnalysis.LoadBalancer.get_tweets( id, tweet)
+#    Logger.info("tweet: #{inspect(tweet)}")
+    EngagementAnalysis.LoadBalancer.get_tweet(id, tweet)
     EngagementAnalysis.AutoScaler.receive_notification()
-    RetweetExtracting.LoadBalancer.get_tweets(id, tweet)
-    RetweetExtracting.AutoScaler.receive_notification()
-    SentimentAnalysis.LoadBalancer.get_tweets(id, tweet)
+    RetweetAnalysis.LoadBalancer.get_tweet(id, tweet)
+    RetweetAnalysis.AutoScaler.receive_notification()
+    SentimentAnalysis.LoadBalancer.get_tweet(id, tweet)
     SentimentAnalysis.AutoScaler.receive_notification()
+    Aggregator.add_tweet_info(id, tweet)
     {:noreply, state}
   end
 

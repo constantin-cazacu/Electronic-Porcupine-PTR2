@@ -5,11 +5,11 @@ defmodule SentimentAnalysis.LoadBalancer do
   def start_link() do
     worker_list = []
     index = 0
-    Logger.info(">>> Starting Sentiment Load Balancer <<<", ansi_color: :yellow_background)
+    Logger.info("Starting Sentiment Load Balancer", ansi_color: :yellow_background)
     GenServer.start_link(__MODULE__, {worker_list, index}, name: __MODULE__)
   end
 
-  def get_tweets(id, tweet) do
+  def get_tweet(id, tweet) do
     GenServer.cast(__MODULE__, {:receive_tweet, {id, tweet}})
   end
 
@@ -34,13 +34,12 @@ defmodule SentimentAnalysis.LoadBalancer do
 
   def safe_termination(pid_to_kill) do
     if Process.alive?(pid_to_kill) == false do
-      IO.inspect("Retweet Load Balancer: The process is not alive")
+#      IO.inspect("[Sentiment Load Balancer]> The process is not alive")
     else
       {:message_queue_len, list_length} = Process.info(pid_to_kill, :message_queue_len)
       if list_length > 0 do
         Process.send_after(pid_to_kill, {:terminate_work, pid_to_kill}, 5000)
       else
-        worker_after_kill = DynamicSupervisor.count_children(SentimentAnalysis.PoolSupervisor).active
         DynamicSupervisor.terminate_child(SentimentAnalysis.PoolSupervisor, pid_to_kill)
       end
     end
@@ -54,7 +53,7 @@ defmodule SentimentAnalysis.LoadBalancer do
     {worker_list, index} = state
     if length(worker_list) > 0 do
       worker_pid = Enum.at(worker_list, rem(index, length(worker_list)))
-      SentimentAnalysis.Worker.receive_tweets(worker_pid, id, tweet)
+      SentimentAnalysis.Worker.receive_tweet(worker_pid, id, tweet)
     end
     {:noreply, {worker_list, index + 1}}
   end
@@ -68,7 +67,7 @@ defmodule SentimentAnalysis.LoadBalancer do
   def handle_cast({:kill_workers, workers_to_kill}, state) do
     {worker_list, index} = state
     list_of_workers_to_kill = Enum.take(worker_list, workers_to_kill)
-    IO.inspect("Engagement Load Balancer: Workers to kill #{inspect(list_of_workers_to_kill)}")
+#    IO.inspect("Engagement Load Balancer: Workers to kill #{inspect(list_of_workers_to_kill)}")
     new_worker_list = Enum.drop(worker_list, length(list_of_workers_to_kill) * (-1))
     delete_from_list(list_of_workers_to_kill)
     {:noreply, {new_worker_list, index}}

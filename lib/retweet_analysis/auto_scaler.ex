@@ -3,7 +3,7 @@ defmodule RetweetAnalysis.AutoScaler do
   require Logger
 
   def start_link() do
-    Logger.info(">>> Starting Retweet Auto-Scaler <<<", ansi_color: :yellow_background)
+    Logger.info("Starting Retweet Auto-Scaler", ansi_color: :yellow_background)
     count_tweets = 0
     GenServer.start_link(__MODULE__, count_tweets, name: __MODULE__)
   end
