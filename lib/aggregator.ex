@@ -3,7 +3,7 @@ defmodule Aggregator do
   require Logger
 
   def start_link() do
-    Logger.info("Aggregator has started")
+    Logger.info("Aggregator has started", ansi_color: :yellow_background)
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
@@ -70,7 +70,8 @@ defmodule Aggregator do
     case get_keys_number(record) do
       3 ->
         object = create_object(record)
-        Logger.info("Aggregator: object #{inspect(object)}", ansi_color: :magenta)
+#        Logger.info("Aggregator: object #{inspect(object)}", ansi_color: :magenta)
+        Batcher.add_record(object)
         Map.delete(state.records, id)
       _ ->
         records

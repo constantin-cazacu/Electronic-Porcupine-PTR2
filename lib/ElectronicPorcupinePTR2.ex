@@ -18,6 +18,10 @@ defmodule ElectronicPorcupinePTR2 do
         start: {Aggregator, :start_link, []}
       },
       %{
+        id: Batcher,
+        start: {Batcher, :start_link, []}
+      },
+      %{
         id: RetweetAnalysis.TopSupervisor,
         start: {RetweetAnalysis.TopSupervisor, :start_link, []}
       },
