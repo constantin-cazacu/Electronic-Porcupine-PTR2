@@ -3,10 +3,14 @@ defmodule Batcher do
   use GenServer
   require Logger
 
+  @batch_size 99
+  @timer_length 1000
+
   def start_link() do
-    IO.inspect("Starting Batcher")
-    {:ok, mongo_pid} = Mongo.start_link(url: "mongodb://mongoM1:27017,mongoM2:27017,mongoM3:27017/tweeter?replicaSet=rs0")
-    GenServer.start_link(__MODULE__, %{batch: [], records_per_interval: 0, mongo_pid: mongo_pid}, name: __MODULE__)
+    Logger.info("Starting Batcher", anis_color: :yellow_background)
+    {:ok, mongo_pid} = Mongo.start_link(url: "mongodb://localhost:27017/TweetDataStream")
+    timer_ref = schedule_batcher()
+    GenServer.start_link(__MODULE__, %{batch: [], records_per_interval: 0, mongo_pid: mongo_pid, timer_ref: timer_ref}, name: __MODULE__)
   end
 
   def add_record(record) do
@@ -14,11 +18,15 @@ defmodule Batcher do
   end
 
   def schedule_batcher() do
-    Process.send_after(self(), :free, 1000)
+    timer_ref = Process.send_after(self(), :free, @timer_length)
   end
 
-  def send_batch(records) do
-    GenServer.cast(__MODULE__, {:send, records})
+  def send_batch(records, mongo_pid) do
+    batch_size = Kernel.length(records)
+    #    batch_no = System.unique_integer([:positive, :monotonic])
+    Logger.info("[Batcher] Sending batch. Batch Size: #{batch_size}", ansi_color: :light_magenta)
+    Mongo.insert_many(mongo_pid, "tweets", get_tweets(records))
+    Mongo.insert_many(mongo_pid, "users", get_users(records))
   end
 
   def get_tweets(records) do
@@ -30,34 +38,37 @@ defmodule Batcher do
   end
 
   def init(state) do
-    schedule_batcher()
+#    schedule_batcher()
     {:ok, state}
   end
 
   def handle_cast({:add, record}, state) do
     record_buffer = [record | state.batch]
-    case state.records_per_interval > 200 do
+    new_records_per_interval = state.records_per_interval + 1
+    #    {:noreply, %{batch: record_buffer, records_per_interval: state.records_per_interval + 1, mongo_pid: state.mongo_pid}}
+    case state.records_per_interval >= @batch_size do
       true ->
-        send_batch(record_buffer)
-        schedule_batcher()
-        {:noreply, %{batch: [], records_per_interval: 0}}
+        send_batch(record_buffer, state.mongo_pid)
+        Process.cancel_timer(state.timer_ref)
+        timer_ref = schedule_batcher()
+        {:noreply, %{batch: [], records_per_interval: 0, mongo_pid: state.mongo_pid, timer_ref: timer_ref}}
       false ->
-        IO.inspect("[Batcher] added to record buffer")
-        {:noreply, %{batch: record_buffer, records_per_interval: state.records_per_interval + 1, mongo_pid: state.mongo_pid}}
+#        Logger.info("[Batcher] added to record buffer", ansi_color: :light_blue)
+        {:noreply, %{batch: record_buffer, records_per_interval: new_records_per_interval, mongo_pid: state.mongo_pid, timer_ref: state.timer_ref}}
     end
   end
 
-  def handle_cast({:send, records}, state) do
-    IO.inspect("[Batcher] sending batch")
-    Mongo.insert_many(state.mongo_pid, "tweets", get_tweets(records))
-    Mongo.insert_many(state.mongo_pid, "users", get_users(records))
-    {:noreply, state}
-  end
-
   def handle_info(:free, state) do
-    send_batch(state.batch)
-    schedule_batcher()
-    {:noreply, %{batch: [], records_per_interval: 0, mongo_pid: state.mongo_pid}}
+    if Kernel.length(state.batch) == 0 do
+#      Process.cancel_timer(state.timer_ref)
+      timer_ref = schedule_batcher()
+      {:noreply, %{batch: state.batch, records_per_interval: state.records_per_interval, mongo_pid: state.mongo_pid, timer_ref: timer_ref}}
+    else
+      send_batch(state.batch, state.mongo_pid)
+#      Process.cancel_timer(state.timer_ref)
+      timer_ref = schedule_batcher()
+      {:noreply, %{batch: [], records_per_interval: 0, mongo_pid: state.mongo_pid, timer_ref: timer_ref}}
+    end
   end
 
 end
