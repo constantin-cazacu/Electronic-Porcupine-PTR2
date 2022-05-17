@@ -3,7 +3,7 @@ defmodule SentimentAnalysis.TopSupervisor do
   require Logger
 
   def start_link() do
-    IO.inspect("Starting Sentiment Top Supervisor", ansi_color: :yellow_background)
+    IO.inspect("Starting Sentiment Top Supervisor", ansi_color: :yellow)
     Supervisor.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 

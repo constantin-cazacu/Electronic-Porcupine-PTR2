@@ -3,7 +3,7 @@ defmodule RetweetAnalysis.TopSupervisor do
   require Logger
 
   def start_link() do
-    IO.inspect("Starting Retweet Top Supervisor", ansi_color: :yellow_background)
+    IO.inspect("Starting Retweet Top Supervisor", ansi_color: :yellow)
     Supervisor.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 

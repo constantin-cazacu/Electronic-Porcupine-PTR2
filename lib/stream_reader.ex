@@ -5,7 +5,7 @@ defmodule StreamReader do
   require Logger
 
   def start_link(url) do
-    Logger.info("Starting Stream Reader", ansi_color: :yellow_background)
+    Logger.info("Starting Stream Reader", ansi_color: :yellow)
     Logger.info(url)
     #    spawns get_tweet function from the given module,
     #    links it to current process

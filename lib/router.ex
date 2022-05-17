@@ -4,7 +4,7 @@ defmodule Router do
   require Logger
 
   def start_link() do
-    Logger.info("Starting Router", ansi_color: :yellow_background)
+    Logger.info("Starting Router", ansi_color: :yellow)
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 

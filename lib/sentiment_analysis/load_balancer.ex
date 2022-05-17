@@ -5,7 +5,7 @@ defmodule SentimentAnalysis.LoadBalancer do
   def start_link() do
     worker_list = []
     index = 0
-    Logger.info("Starting Sentiment Load Balancer", ansi_color: :yellow_background)
+    Logger.info("Starting Sentiment Load Balancer", ansi_color: :yellow)
     GenServer.start_link(__MODULE__, {worker_list, index}, name: __MODULE__)
   end
 
