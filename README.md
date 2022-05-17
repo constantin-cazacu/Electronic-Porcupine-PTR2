@@ -32,6 +32,7 @@ def deps do
   ]
 end
 ```
+The image containing the SSE streams is available at alexburlacu/rtp-server:faf18x
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
