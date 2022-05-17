@@ -18,6 +18,10 @@ defmodule ElectronicPorcupinePTR2 do
         start: {Aggregator, :start_link, []}
       },
       %{
+        id: BatcherStats,
+        start: {BatcherStats, :start_link, []}
+      },
+      %{
         id: Batcher,
         start: {Batcher, :start_link, []}
       },

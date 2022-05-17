@@ -3,7 +3,7 @@ defmodule SentimentAnalysis.PoolSupervisor do
   require Logger
 
   def start_link() do
-    Logger.info("Starting Sentiment Pool Supervisory", ansi_color: :yellow_background)
+    Logger.info("Starting Sentiment Pool Supervisory", ansi_color: :yellow)
     supervisor = DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)
     start_worker(10)
     supervisor
